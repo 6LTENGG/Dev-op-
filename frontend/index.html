@@ -1,0 +1,2842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Restaurant - Order System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Landing Page Styles */
+        .landing-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .landing-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            max-width: 500px;
+            width: 100%;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutRight {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .landing-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .landing-subtitle {
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .role-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .role-btn {
+            padding: 18px 30px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .customer-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            box-shadow: 0 8px 25px rgba(238, 90, 36, 0.3);
+        }
+
+        .customer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(238, 90, 36, 0.4);
+        }
+
+        .admin-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            box-shadow: 0 8px 25px rgba(68, 160, 141, 0.3);
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(68, 160, 141, 0.4);
+        }
+
+        /* Main App Container */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            background: #f8fafc;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .back-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #cbd5e0;
+            transform: translateX(-2px);
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .language-toggle {
+            display: flex;
+            gap: 5px;
+            background: #edf2f7;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .lang-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .lang-btn.active {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Content Area */
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Customer Flow Styles */
+        .step-container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .step-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* QR Scanner Simulation */
+        .qr-scanner {
+            text-align: center;
+            padding: 40px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .qr-icon {
+            font-size: 4rem;
+            color: #a0aec0;
+            margin-bottom: 20px;
+        }
+
+        /* Group Setup */
+        .group-setup {
+            display: grid;
+            gap: 20px;
+        }
+
+        .people-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .counter-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .counter-btn:hover {
+            background: #5a67d8;
+            transform: scale(1.1);
+        }
+
+        .people-count {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d3748;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        /* Avatar Setup */
+        .avatars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .avatar-card {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-card.active {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .avatar-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .avatar-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        /* Menu Styles */
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 1.2rem;
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .menu-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .item-image {
+            height: 200px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .item-details {
+            padding: 20px;
+        }
+
+        .item-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .item-description {
+            color: #718096;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-price {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .item-badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .badge.spicy {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .badge.vegetarian {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge.popular {
+            background: #feebc8;
+            color: #c05621;
+        }
+
+        /* Order Assignment */
+        .assignment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .avatar-assign {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-assign.selected {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        /* Cart and Checkout */
+        .cart {
+            position: fixed;
+            right: 20px;
+            top: 100px;
+            width: 300px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .cart-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-items {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .total-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(238, 90, 36, 0.3);
+        }
+
+        .checkout-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Primary Button */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Admin Styles */
+        .admin-container {
+            background: #1a202c;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: #2d3748;
+            padding: 20px 0;
+        }
+
+        .admin-content {
+            padding: 30px;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: #2d3748;
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .card-label {
+            color: #a0aec0;
+            font-size: 0.9rem;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #4a5568;
+            padding-bottom: 10px;
+        }
+        
+        .tab-btn {
+            background: transparent;
+            color: #a0aec0;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:hover {
+            color: white;
+            background: #4a5568;
+        }
+        
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab-content {
+            background: #2d3748;
+            padding: 30px;
+            border-radius: 16px;
+        }
+
+        .dietary-option {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .dietary-option.selected {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .dietary-option:hover {
+            border-color: #a0aec0;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: black;
+        }
+
+        /* Status Updates */
+        .status-tracker {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .status-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .status-step::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            right: -50%;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: 1;
+        }
+
+        .status-step:last-child::before {
+            display: none;
+        }
+
+        .status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .status-step.active .status-icon {
+            background: #667eea;
+            color: white;
+        }
+
+        .status-step.completed .status-icon {
+            background: #48bb78;
+            color: white;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .landing-card {
+                padding: 40px 30px;
+            }
+
+            .landing-title {
+                font-size: 2rem;
+            }
+
+            .cart {
+                position: relative;
+                width: 100%;
+                right: auto;
+                top: auto;
+                margin-top: 20px;
+            }
+
+            .menu-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: auto;
+            }
+
+            .avatars-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .assignment-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landing" class="landing-container">
+        <div class="landing-card">
+            <div class="logo">🍽️</div>
+            <h1 class="landing-title">Digital Restaurant</h1>
+            <p class="landing-subtitle">Modern ordering system for seamless dining experience</p>
+            <div class="role-buttons">
+                <button class="role-btn customer-btn" onclick="startCustomerFlow()">
+                    🧑‍🍳 Start Ordering
+                </button>
+                <button class="role-btn admin-btn" onclick="startAdminFlow()">
+                    ⚙️ Admin Portal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer App -->
+    <div id="customerApp" class="app-container">
+        <div class="header">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">← Back</button>
+                <h1 class="header-title">Digital Menu</h1>
+                <div class="language-toggle">
+                    <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button>
+                    <button class="lang-btn" data-lang="th" onclick="setLanguage('th')">TH</button>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <!-- Step 1: QR Scanner -->
+            <div id="qrStep" class="step-container">
+                <h2 class="step-title">
+                    <div class="step-number">1</div>
+                    <span data-en="Scan Table QR Code" data-th="สแกน QR โต๊ะ">Scan Table QR Code</span>
+                </h2>
+                <div class="qr-scanner">
+                    <div class="qr-icon">📱</div>
+                    <p data-en="Point your camera at the QR code on your table" data-th="เล็งกล้องไปที่ QR code บนโต๊ะ">Point your camera at the QR code on your table</p>
+                    <br>
+                    <button class="btn-primary" onclick="simulateQRScan()" data-en="Simulate QR Scan" data-th="จำลอง QR สแกน">Simulate QR Scan</button>
+                    <button class="btn-primary" onclick="goToGroupSetup()" style="margin-left: 10px;" data-en="Offline Mode" data-th="โหมดออฟไลน์">Offline Mode</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Group Setup -->
+            <div id="groupStep" class="step-container hidden">
+                <h2 class="step-title">
+                    <div class="step-number">2</div>
+                    <span data-en="Group Setup" data-th="ตั้งค่ากลุ่ม">Group Setup</span>
+                </h2>
+                <div class="group-setup">
+                    <h3 data-en="Number of People" data-th="จำนวนคน">Number of People</h3>
+                    <div class="people-counter">
+                        <button class="counter-btn" onclick="changePeopleCount(-1)">-</button>
+                        <span class="people-count" id="peopleCount">2</span>
+                        <button class="counter-btn" onclick="changePeopleCount(1)">+</button>
+                    </div>
+                    <button class="btn-primary" onclick="generateAvatars()" data-en="Create Avatars" data-th="สร้างตัวละคร">Create Avatars</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Avatar Setup -->
+            <div id="avatarStep" class="step-container hidden">
+                <h2 class="step-title">
+                    <div class="step-number">3</div>
+                    <span data-en="Create Your Avatars" data-th="สร้างตัวละครของคุณ">Create Your Avatars</span>
+                </h2>
+                <div id="avatarsGrid" class="avatars-grid">
+                    <!-- Avatars will be generated here -->
+                </div>
+                <button class="btn-primary" onclick="goToMenu()" style="margin-top: 20px;" data-en="Start Ordering" data-th="เริ่มสั่งอาหาร">Start Ordering</button>
+            </div>
+
+            <!-- Step 4: Menu -->
+            <div id="menuStep" class="step-container hidden">
+                <h2 class="step-title">
+                    <div class="step-number">4</div>
+                    <span data-en="Browse Menu" data-th="เรียกดูเมนู">Browse Menu</span>
+                </h2>
+                <div class="menu-header">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="menuSearch" placeholder="Search menu..." data-en="Search menu..." data-th="ค้นหาเมนู...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <div class="category-filters" id="categoryFilters">
+                        <button class="filter-btn active" data-category="all" data-en="All" data-th="ทั้งหมด">All</button>
+                        <button class="filter-btn" data-category="appetizers" data-en="Appetizers" data-th="ของว่าง">Appetizers</button>
+                        <button class="filter-btn" data-category="mains" data-en="Main Course" data-th="จานหลัก">Main Course</button>
+                        <button class="filter-btn" data-category="desserts" data-en="Desserts" data-th="ของหวาน">Desserts</button>
+                        <button class="filter-btn" data-category="drinks" data-en="Drinks" data-th="เครื่องดื่ม">Drinks</button>
+                    </div>
+                </div>
+                <div id="menuItems" class="menu-items">
+                    <!-- Menu items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Step 5: Checkout -->
+            <div id="checkoutStep" class="step-container hidden">
+                <h2 class="step-title">
+                    <div class="step-number">5</div>
+                    <span data-en="Checkout" data-th="ชำระเงิน">Checkout</span>
+                </h2>
+                <div id="checkoutContent">
+                    <!-- Checkout content will be populated here -->
+                </div>
+            </div>
+
+            <!-- Step 6: Order Status -->
+            <div id="statusStep" class="step-container hidden">
+                <h2 class="step-title">
+                    <div class="step-number">6</div>
+                    <span data-en="Order Status" data-th="สถานะการสั่ง">Order Status</span>
+                </h2>
+                <div class="status-tracker">
+                    <div class="status-step active">
+                        <div class="status-icon">📋</div>
+                        <span data-en="Pending" data-th="รอดำเนินการ">Pending</span>
+                    </div>
+                    <div class="status-step">
+                        <div class="status-icon">🍳</div>
+                        <span data-en="Preparing" data-th="กำลังเตรียม">Preparing</span>
+                    </div>
+                    <div class="status-step">
+                        <div class="status-icon">👨‍🍳</div>
+                        <span data-en="Cooking" data-th="กำลังทำ">Cooking</span>
+                    </div>
+                    <div class="status-step">
+                        <div class="status-icon">✅</div>
+                        <span data-en="Ready" data-th="พร้อม">Ready</span>
+                    </div>
+                    <div class="status-step">
+                        <div class="status-icon">🍽️</div>
+                        <span data-en="Served" data-th="เสิร์ฟแล้ว">Served</span>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 20px; color: #718096;">
+                    <span data-en="Queue Number:" data-th="หมายเลขคิว:">Queue Number:</span> <strong id="queueNumber">A01</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Shopping Cart -->
+        <div id="cart" class="cart hidden">
+            <div class="cart-header">
+                <h3 data-en="Your Order" data-th="รายการสั่ง">Your Order</h3>
+                <span id="cartCount">0</span>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items will be populated here -->
+            </div>
+            <div class="cart-footer">
+                <div class="total-amount" id="totalAmount">฿0</div>
+                <button class="checkout-btn" onclick="goToCheckout()" data-en="Checkout" data-th="ชำระเงิน">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin App -->
+    <div id="adminApp" class="app-container admin-container hidden">
+        <div class="header admin-header">
+            <div class="header-content">
+                <button class="back-btn" onclick="goBack()">← Back</button>
+                <h1 class="header-title">Admin Dashboard</h1>
+                <button class="btn-primary" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        <div class="admin-content">
+            <div class="dashboard-cards">
+                <div class="dashboard-card">
+                    <div class="card-icon">📊</div>
+                    <div class="card-value" id="todayOrders">24</div>
+                    <div class="card-label">Today's Orders</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-icon">💰</div>
+                    <div class="card-value" id="todayRevenue">฿2,450</div>
+                    <div class="card-label">Today's Revenue</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-icon">🪑</div>
+                    <div class="card-value" id="occupiedTables">8/12</div>
+                    <div class="card-label">Occupied Tables</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-icon">⏱️</div>
+                    <div class="card-value" id="avgWaitTime">15m</div>
+                    <div class="card-label">Avg Wait Time</div>
+                </div>
+            </div>
+
+            <!-- Admin Tabs -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="queue" onclick="showAdminTab('queue')">Queue Management</button>
+                <button class="tab-btn" data-tab="menu" onclick="showAdminTab('menu')">Menu Management</button>
+                <button class="tab-btn" data-tab="tables" onclick="showAdminTab('tables')">Table Management</button>
+            </div>
+
+            <!-- Queue Management -->
+            <div id="queueTab" class="tab-content">
+                <h3>Current Queue</h3>
+                <div class="queue-list" id="queueList">
+                    <!-- Queue items populated by JS -->
+                </div>
+            </div>
+
+            <!-- Menu Management -->
+            <div id="menuTab" class="tab-content hidden">
+                <div class="menu-management">
+                    <h3>Menu Items</h3>
+                    <button class="btn-primary" onclick="showAddItemForm()">+ Add New Item</button>
+                    <div id="menuManagementList" class="management-list">
+                        <!-- Menu management items -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Management -->
+            <div id="tablesTab" class="tab-content hidden">
+                <div class="tables-grid" id="tablesGrid">
+                    <!-- Tables will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Application State - Fixed structure
+        const appState = {
+            currentStep: 'landing',
+            language: 'en',
+            peopleCount: 2,
+            avatars: [],
+            cart: [], // Array-based cart for better management
+            totalAmount: 0,
+            tableNumber: 'T05',
+            queueNumber: 'A01',
+            currentStatus: 0,
+            adminLoggedIn: false,
+            currentFilter: 'all',
+            searchTerm: '',
+            nextCartId: 1
+        };
+
+        // Sample Menu Data
+        const menuData = {
+            appetizers: [
+                {
+                    id: 1,
+                    name: { en: 'Spring Rolls', th: 'ปอเปี๊ยะทอด' },
+                    description: { en: 'Crispy vegetable spring rolls', th: 'ปอเปี๊ยะผักกรอบ' },
+                    price: 120,
+                    category: 'appetizers',
+                    badges: ['vegetarian'],
+                    icon: '🥢',
+                    dietary: { vegetarian: true, spicy: false }
+                },
+                {
+                    id: 2,
+                    name: { en: 'Chicken Satay', th: 'ไก่สะเต๊ะ' },
+                    description: { en: 'Grilled chicken skewers with peanut sauce', th: 'ไก่ย่างเสียบไม้กับซอสถั่ว' },
+                    price: 150,
+                    category: 'appetizers',
+                    badges: ['popular', 'spicy'],
+                    icon: '🍗',
+                    dietary: { vegetarian: false, spicy: true }
+                },
+                {
+                    id: 9,
+                    name: { en: 'Tom Yum Soup', th: 'ต้มยำ' },
+                    description: { en: 'Spicy and sour Thai soup', th: 'ต้มยำรสเผ็ดเปรี้ยว' },
+                    price: 140,
+                    category: 'appetizers',
+                    badges: ['spicy', 'popular'],
+                    icon: '🍲',
+                    dietary: { vegetarian: false, spicy: true }
+                }
+            ],
+            mains: [
+                {
+                    id: 3,
+                    name: { en: 'Pad Thai', th: 'ผัดไทย' },
+                    description: { en: 'Classic Thai stir-fried noodles', th: 'ก๋วยเตี๋ยวผัดไทยแท้' },
+                    price: 180,
+                    category: 'mains',
+                    badges: ['popular'],
+                    icon: '🍜',
+                    dietary: { vegetarian: false, spicy: true }
+                },
+                {
+                    id: 4,
+                    name: { en: 'Green Curry', th: 'แกงเขียวหวาน' },
+                    description: { en: 'Spicy green curry with coconut milk', th: 'แกงเขียวหวานกะทิ' },
+                    price: 220,
+                    category: 'mains',
+                    badges: ['spicy'],
+                    icon: '🍛',
+                    dietary: { vegetarian: false, spicy: true }
+                },
+                {
+                    id: 5,
+                    name: { en: 'Vegetable Stir Fry', th: 'ผัดผักรวม' },
+                    description: { en: 'Fresh mixed vegetables', th: 'ผักสดผัดรวม' },
+                    price: 140,
+                    category: 'mains',
+                    badges: ['vegetarian'],
+                    icon: '🥬',
+                    dietary: { vegetarian: true, spicy: false }
+                },
+                {
+                    id: 10,
+                    name: { en: 'Massaman Curry', th: 'แกงมัสมั่น' },
+                    description: { en: 'Rich and mild curry with potatoes', th: 'แกงมัสมั่นมันฝรั่ง' },
+                    price: 200,
+                    category: 'mains',
+                    badges: ['popular'],
+                    icon: '🍖',
+                    dietary: { vegetarian: false, spicy: false }
+                }
+            ],
+            desserts: [
+                {
+                    id: 6,
+                    name: { en: 'Mango Sticky Rice', th: 'ข้าวเหนียวมะม่วง' },
+                    description: { en: 'Sweet sticky rice with fresh mango', th: 'ข้าวเหนียวหวานกับมะม่วงสด' },
+                    price: 90,
+                    category: 'desserts',
+                    badges: ['popular'],
+                    icon: '🥭',
+                    dietary: { vegetarian: true, spicy: false }
+                },
+                {
+                    id: 11,
+                    name: { en: 'Thai Ice Cream', th: 'ไอศกรีมไทย' },
+                    description: { en: 'Traditional coconut ice cream', th: 'ไอศกรีมกะทิแท้' },
+                    price: 70,
+                    category: 'desserts',
+                    badges: ['vegetarian'],
+                    icon: '🍨',
+                    dietary: { vegetarian: true, spicy: false }
+                }
+            ],
+            drinks: [
+                {
+                    id: 7,
+                    name: { en: 'Thai Iced Tea', th: 'ชาไทยเย็น' },
+                    description: { en: 'Traditional Thai tea with milk', th: 'ชาไทยแท้นมสด' },
+                    price: 60,
+                    category: 'drinks',
+                    badges: ['popular'],
+                    icon: '🧋',
+                    dietary: { vegetarian: true, spicy: false }
+                },
+                {
+                    id: 8,
+                    name: { en: 'Fresh Coconut Water', th: 'น้ำมะพร้าวสด' },
+                    description: { en: 'Fresh coconut water', th: 'น้ำมะพร้าวสดๆ' },
+                    price: 50,
+                    category: 'drinks',
+                    badges: ['vegetarian'],
+                    icon: '🥥',
+                    dietary: { vegetarian: true, spicy: false }
+                },
+                {
+                    id: 12,
+                    name: { en: 'Lemon Grass Juice', th: 'น้ำตะไคร้' },
+                    description: { en: 'Refreshing herbal drink', th: 'เครื่องดื่มสมุนไพรสดชื่น' },
+                    price: 45,
+                    category: 'drinks',
+                    badges: ['vegetarian'],
+                    icon: '🌿',
+                    dietary: { vegetarian: true, spicy: false }
+                }
+            ]
+        };
+
+        // Animal avatars for customers
+        const animalAvatars = ['🐶', '🐱', '🐼', '🦊', '🐨', '🐸', '🐵', '🦁', '🐻', '🐰'];
+
+        // Global variables for modal selections
+        let selectedSpicy = 0;
+        let selectedProtein = 'Original';
+        let selectedAvatar = null;
+        let currentModalItem = null;
+
+        // Utility Functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function getCurrentText(enText, thText) {
+            return appState.language === 'th' ? thText : enText;
+        }
+
+        function formatCurrency(amount) {
+            return `฿${amount.toLocaleString()}`;
+        }
+
+        // Navigation Functions
+        function startCustomerFlow() {
+            document.getElementById('landing').style.display = 'none';
+            document.getElementById('customerApp').style.display = 'block';
+            appState.currentStep = 'qr';
+        }
+
+        function startAdminFlow() {
+            if (!appState.adminLoggedIn) {
+                showAdminLogin();
+            } else {
+                document.getElementById('landing').style.display = 'none';
+                document.getElementById('adminApp').style.display = 'block';
+                appState.currentStep = 'admin';
+                loadAdminDashboard();
+            }
+        }
+
+        function goBack() {
+            document.getElementById('customerApp').style.display = 'none';
+            document.getElementById('adminApp').style.display = 'none';
+            document.getElementById('landing').style.display = 'flex';
+            appState.currentStep = 'landing';
+            resetApp();
+        }
+
+        function resetApp() {
+            appState.peopleCount = 2;
+            appState.avatars = [];
+            appState.cart = [];
+            appState.totalAmount = 0;
+            appState.currentFilter = 'all';
+            appState.searchTerm = '';
+            appState.nextCartId = 1;
+            
+            updateCartDisplay();
+            
+            // Hide all steps and show first step
+            document.querySelectorAll('.step-container').forEach(step => step.classList.add('hidden'));
+            document.getElementById('qrStep').classList.remove('hidden');
+            document.getElementById('cart').classList.add('hidden');
+            
+            // Reset filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            const allButton = document.querySelector('[data-category="all"]');
+            if (allButton) allButton.classList.add('active');
+            
+            // Clear search
+            const searchInput = document.getElementById('menuSearch');
+            if (searchInput) searchInput.value = '';
+        }
+
+        // Customer Flow Functions
+        function simulateQRScan() {
+            appState.tableNumber = 'T' + Math.floor(Math.random() * 20 + 1).toString().padStart(2, '0');
+            showSuccessMessage(`Scanned Table ${appState.tableNumber}! Welcome to your table.`);
+            goToGroupSetup();
+        }
+
+        function goToGroupSetup() {
+            document.getElementById('qrStep').classList.add('hidden');
+            document.getElementById('groupStep').classList.remove('hidden');
+        }
+
+        function changePeopleCount(delta) {
+            appState.peopleCount = Math.max(1, Math.min(10, appState.peopleCount + delta));
+            document.getElementById('peopleCount').textContent = appState.peopleCount;
+        }
+
+        function generateAvatars() {
+            appState.avatars = [];
+            for (let i = 0; i < appState.peopleCount; i++) {
+                appState.avatars.push({
+                    id: i,
+                    animal: animalAvatars[i % animalAvatars.length],
+                    nickname: `Person ${i + 1}`,
+                    isOrdering: true,
+                    paymentMethod: 'cash'
+                });
+            }
+            
+            document.getElementById('groupStep').classList.add('hidden');
+            document.getElementById('avatarStep').classList.remove('hidden');
+            renderAvatars();
+        }
+
+        function renderAvatars() {
+            const grid = document.getElementById('avatarsGrid');
+            grid.innerHTML = '';
+            
+            appState.avatars.forEach((avatar, index) => {
+                const card = document.createElement('div');
+                card.className = 'avatar-card';
+                card.innerHTML = `
+                    <div class="avatar-icon" onclick="cycleAnimal(${index})">${avatar.animal}</div>
+                    <input type="text" class="avatar-input" placeholder="${getCurrentText('Nickname', 'ชื่อเล่น')}" 
+                           value="${avatar.nickname}" onchange="updateNickname(${index}, this.value)">
+                    <br>
+                    <label style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px;">
+                        <input type="checkbox" ${avatar.isOrdering ? 'checked' : ''} onchange="toggleOrdering(${index})">
+                        <span>${getCurrentText('Will order food', 'จะสั่งอาหาร')}</span>
+                    </label>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function cycleAnimal(index) {
+            const currentIndex = animalAvatars.indexOf(appState.avatars[index].animal);
+            const nextIndex = (currentIndex + 1) % animalAvatars.length;
+            appState.avatars[index].animal = animalAvatars[nextIndex];
+            renderAvatars();
+        }
+
+        function updateNickname(index, nickname) {
+            appState.avatars[index].nickname = nickname.trim() || `Person ${index + 1}`;
+        }
+
+        function toggleOrdering(index) {
+            appState.avatars[index].isOrdering = !appState.avatars[index].isOrdering;
+        }
+
+        function goToMenu() {
+            // Ensure all avatars have valid nicknames
+            appState.avatars.forEach((avatar, index) => {
+                if (!avatar.nickname || avatar.nickname.trim() === '') {
+                    avatar.nickname = `Person ${index + 1}`;
+                }
+            });
+            
+            document.getElementById('avatarStep').classList.add('hidden');
+            document.getElementById('menuStep').classList.remove('hidden');
+            document.getElementById('cart').classList.remove('hidden');
+            renderMenu();
+            handleCartDisplay();
+        }
+
+        // Menu Functions - Fixed filtering and search
+        function getFilteredMenu() {
+            let items = Object.values(menuData).flat();
+            
+            // Apply category filter
+            if (appState.currentFilter !== 'all') {
+                items = items.filter(item => item.category === appState.currentFilter);
+            }
+            
+            // Apply search filter
+            if (appState.searchTerm) {
+                const searchLower = appState.searchTerm.toLowerCase();
+                items = items.filter(item => 
+                    item.name.en.toLowerCase().includes(searchLower) ||
+                    item.name.th.toLowerCase().includes(searchLower) ||
+                    item.description.en.toLowerCase().includes(searchLower) ||
+                    item.description.th.toLowerCase().includes(searchLower)
+                );
+            }
+            
+            return items;
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menuItems');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const items = getFilteredMenu();
+            
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #718096;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">🔍</div>
+                        <p>${getCurrentText('No items found', 'ไม่พบรายการ')}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            items.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'menu-item';
+                itemCard.onclick = () => showItemModal(item);
+                
+                const badges = item.badges.map(badge => {
+                    const badgeText = badge === 'popular' ? getCurrentText('Popular', 'ยอดนิยม') :
+                                     badge === 'spicy' ? getCurrentText('Spicy', 'เผ็ด') :
+                                     badge === 'vegetarian' ? getCurrentText('Vegetarian', 'เจ') : badge;
+                    return `<span class="badge ${badge}">${badgeText}</span>`;
+                }).join('');
+                
+                itemCard.innerHTML = `
+                    <div class="item-image">${item.icon}</div>
+                    <div class="item-details">
+                        <h4 class="item-name">${item.name[appState.language]}</h4>
+                        <p class="item-description">${item.description[appState.language]}</p>
+                        <div class="item-footer">
+                            <span class="item-price">฿${item.price}</span>
+                            <div class="item-badges">${badges}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(itemCard);
+            });
+        }
+
+        // Fixed search function with proper debouncing
+        const debouncedSearch = debounce((searchTerm) => {
+            appState.searchTerm = searchTerm;
+            renderMenu();
+        }, 300);
+
+        function searchMenu(searchTerm) {
+            debouncedSearch(searchTerm);
+        }
+
+        // Fixed filter function with proper event handling
+        function filterMenu(category, buttonElement) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+            
+            appState.currentFilter = category;
+            renderMenu();
+        }
+
+        // Fixed modal system
+        function showItemModal(item) {
+            const orderingAvatars = appState.avatars.filter(a => a.isOrdering);
+            if (orderingAvatars.length === 0) {
+                alert(getCurrentText('No one is set to order food!', 'ไม่มีใครตั้งค่าให้สั่งอาหาร!'));
+                return;
+            }
+            
+            // Reset modal state
+            selectedSpicy = 0;
+            selectedProtein = 'Original';
+            selectedAvatar = null;
+            currentModalItem = { ...item }; // Store copy of original item
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            
+            const avatarOptions = orderingAvatars.map(avatar => 
+                `<div class="avatar-assign" onclick="selectAvatarForOrder(${avatar.id}, event)">
+                    ${avatar.animal}<br><small>${avatar.nickname}</small>
+                </div>`
+            ).join('');
+
+            const proteinOptions = ['Original', 'Chicken', 'Pork', 'Beef', 'Vegetarian', 'Seafood'];
+            const spicyLevels = [
+                { en: 'No Spicy', th: 'ไม่เผ็ด' },
+                { en: 'Mild', th: 'เผ็ดน้อย' },
+                { en: 'Medium', th: 'เผ็ดปานกลาง' },
+                { en: 'Hot', th: 'เผ็ด' },
+                { en: 'Extra Hot', th: 'เผ็ดมาก' }
+            ];
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3 style="color: #2d3748; margin-bottom: 15px;">${item.icon} ${item.name[appState.language]}</h3>
+                    <p style="color: #718096; margin-bottom: 20px;">${item.description[appState.language]}</p>
+                    <p style="font-size: 1.3rem; font-weight: bold; color: #667eea; margin-bottom: 25px;" data-base-price="${item.price}">
+                        ${getCurrentText('Base Price:', 'ราคาพื้นฐาน:')} ฿${item.price}
+                    </p>
+                    
+                    <!-- Spicy Level Selection -->
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 15px; color: #2d3748;">🌶️ ${getCurrentText('Spicy Level', 'ระดับความเผ็ด')}</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
+                            ${spicyLevels.map((level, index) => `
+                                <div class="dietary-option ${index === 0 ? 'selected' : ''}" onclick="selectSpicyLevel(${index}, event)" data-spicy="${index}">
+                                    <div style="font-size: 1.5rem; margin-bottom: 5px;">${'🌶️'.repeat(index)}</div>
+                                    <small>${level[appState.language]}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- Protein/Alternative Selection -->
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 15px; color: #2d3748;">🥩 ${getCurrentText('Protein Choice', 'เลือกโปรตีน')}</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                            ${proteinOptions.map((protein, index) => `
+                                <div class="dietary-option ${index === 0 ? 'selected' : ''}" onclick="selectProtein('${protein}', event)" data-protein="${protein}">
+                                    <div style="font-size: 1.5rem; margin-bottom: 5px;">${getProteinIcon(protein)}</div>
+                                    <small>${protein}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <!-- Special Instructions -->
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 15px; color: #2d3748;">📝 ${getCurrentText('Special Instructions', 'คำขอพิเศษ')}</h4>
+                        <textarea id="specialNotes" placeholder="${getCurrentText('Add any special requests or dietary restrictions...', 'เพิ่มคำขอพิเศษหรือข้อจำกัดทางอาหาร...')}" 
+                                  style="width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; height: 80px; font-size: 14px; resize: vertical;"></textarea>
+                    </div>
+                    
+                    <!-- Assign to Avatar -->
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 15px; color: #2d3748;">👥 ${getCurrentText('Assign to:', 'มอบหมายให้:')} <span style="color: #e53e3e;">*</span></h4>
+                        <div class="assignment-grid">${avatarOptions}</div>
+                    </div>
+                    
+                    <!-- Final Price Display -->
+                    <div style="background: #f7fafc; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 1.1rem; color: #4a5568;">${getCurrentText('Final Price', 'ราคารวม')}</div>
+                        <div id="finalPrice" style="font-size: 1.5rem; font-weight: bold; color: #667eea;">฿${item.price}</div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px;">
+                        <button onclick="addCustomizedItemToCart()" class="btn-primary" style="flex: 1; font-size: 1.1rem;">${getCurrentText('Add to Cart', 'เพิ่มลงตะกร้า')}</button>
+                        <button onclick="closeModal()" 
+                                style="background: #e2e8f0; color: #4a5568; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-weight: 600;">${getCurrentText('Cancel', 'ยกเลิก')}</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Add event listeners for clicking outside modal
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) {
+                document.body.removeChild(modal);
+            }
+            // Reset modal state
+            selectedSpicy = 0;
+            selectedProtein = 'Original';
+            selectedAvatar = null;
+            currentModalItem = null;
+        }
+
+        // Fixed customization functions with proper event handling
+        function selectSpicyLevel(level, event) {
+            event.stopPropagation();
+            document.querySelectorAll('[data-spicy]').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`[data-spicy="${level}"]`).classList.add('selected');
+            selectedSpicy = level;
+            updateFinalPrice();
+        }
+
+        function selectProtein(protein, event) {
+            event.stopPropagation();
+            document.querySelectorAll('[data-protein]').forEach(el => el.classList.remove('selected'));
+            document.querySelector(`[data-protein="${protein}"]`).classList.add('selected');
+            selectedProtein = protein;
+            updateFinalPrice();
+        }
+
+        function selectAvatarForOrder(avatarId, event) {
+            event.stopPropagation();
+            document.querySelectorAll('.avatar-assign').forEach(el => el.classList.remove('selected'));
+            event.target.closest('.avatar-assign').classList.add('selected');
+            selectedAvatar = avatarId;
+        }
+
+        // Fixed price calculation
+        function updateFinalPrice() {
+            if (!currentModalItem) return;
+            
+            let finalPrice = currentModalItem.price;
+            
+            // Add spicy level cost (5 THB per level)
+            if (selectedSpicy > 0) {
+                finalPrice += selectedSpicy * 5;
+            }
+            
+            // Add protein cost
+            const proteinCosts = {
+                'Original': 0,
+                'Chicken': 20,
+                'Pork': 25,
+                'Beef': 40,
+                'Vegetarian': -10,
+                'Seafood': 60
+            };
+            finalPrice += proteinCosts[selectedProtein] || 0;
+            
+            const finalPriceEl = document.getElementById('finalPrice');
+            if (finalPriceEl) {
+                finalPriceEl.textContent = `฿${finalPrice}`;
+            }
+        }
+
+        function getProteinIcon(protein) {
+            const icons = {
+                'Original': '🍽️',
+                'Chicken': '🐔',
+                'Pork': '🐷',
+                'Beef': '🐮',
+                'Vegetarian': '🥬',
+                'Seafood': '🐟'
+            };
+            return icons[protein] || '🍽️';
+        }
+
+        // Fixed cart management with proper data structure
+        function addCustomizedItemToCart() {
+            if (selectedAvatar === null) {
+                alert(getCurrentText('Please select who this item is for!', 'กรุณาเลือกว่าเมนูนี้สำหรับใคร!'));
+                return;
+            }
+            
+            const notes = document.getElementById('specialNotes').value.trim();
+            const finalPriceText = document.getElementById('finalPrice').textContent;
+            const finalPrice = parseInt(finalPriceText.replace('฿', ''));
+            
+            const avatar = appState.avatars[selectedAvatar];
+            
+            // Create cart item with proper structure
+            const cartItem = {
+                cartId: appState.nextCartId++,
+                itemId: currentModalItem.id,
+                avatarId: selectedAvatar,
+                name: currentModalItem.name,
+                description: currentModalItem.description,
+                icon: currentModalItem.icon,
+                basePrice: currentModalItem.price,
+                finalPrice: finalPrice,
+                quantity: 1,
+                customizations: {
+                    spicyLevel: selectedSpicy,
+                    protein: selectedProtein,
+                    notes: notes
+                },
+                displayName: `${currentModalItem.name[appState.language]}${selectedProtein !== 'Original' ? ` (${selectedProtein})` : ''}${selectedSpicy > 0 ? ` 🌶️x${selectedSpicy}` : ''}`
+            };
+            
+            appState.cart.push(cartItem);
+            updateCartDisplay();
+            closeModal();
+            
+            showSuccessMessage(getCurrentText(
+                `Added ${cartItem.displayName} to ${avatar.nickname}'s order!`,
+                `เพิ่ม ${cartItem.displayName} ให้ ${avatar.nickname} แล้ว!`
+            ));
+        }
+
+        // Fixed cart display with proper grouping
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cartItems');
+            const cartCount = document.getElementById('cartCount');
+            const totalAmount = document.getElementById('totalAmount');
+            
+            if (!cartItems) return;
+            
+            cartItems.innerHTML = '';
+            let totalItems = 0;
+            let grandTotal = 0;
+            
+            if (appState.cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div style="text-align: center; color: #718096; padding: 20px;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🛒</div>
+                        <p>${getCurrentText('Cart is empty', 'ตะกร้าว่าง')}</p>
+                    </div>
+                `;
+            } else {
+                // Add cart controls at top
+                cartItems.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0;">
+                        <button onclick="toggleCart()" style="background: #e2e8f0; color: #4a5568; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                            ${getCurrentText('Hide Cart', 'ซ่อนตะกร้า')}
+                        </button>
+                        <button onclick="clearCart()" style="background: #fed7d7; color: #c53030; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+                            ${getCurrentText('Clear All', 'ล้างทั้งหมด')}
+                        </button>
+                    </div>
+                `;
+                
+                // Group cart items by avatar
+                const itemsByAvatar = {};
+                appState.cart.forEach(item => {
+                    if (!itemsByAvatar[item.avatarId]) {
+                        itemsByAvatar[item.avatarId] = [];
+                    }
+                    itemsByAvatar[item.avatarId].push(item);
+                });
+                
+                Object.keys(itemsByAvatar).forEach(avatarId => {
+                    const avatar = appState.avatars[avatarId];
+                    const items = itemsByAvatar[avatarId];
+                    const avatarTotal = items.reduce((sum, item) => sum + (item.finalPrice * item.quantity), 0);
+                    
+                    const avatarSection = document.createElement('div');
+                    avatarSection.innerHTML = `
+                        <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <strong style="color: #2d3748;">${avatar.animal} ${avatar.nickname}</strong>
+                                <span style="color: #667eea; font-weight: bold;">฿${avatarTotal}</span>
+                            </div>
+                            ${items.map(item => `
+                                <div class="cart-item" style="position: relative; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600; font-size: 0.9rem; color: #2d3748; margin-bottom: 2px;">
+                                            ${item.displayName}
+                                        </div>
+                                        ${item.customizations.notes ? `
+                                            <div style="font-size: 0.75rem; color: #718096; margin-bottom: 5px;">
+                                                "${item.customizations.notes}"
+                                            </div>
+                                        ` : ''}
+                                        <div style="font-size: 0.8rem; color: #4a5568;">
+                                            ฿${item.finalPrice} x ${item.quantity} = ฿${item.finalPrice * item.quantity}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="display: flex; align-items: center; background: white; border-radius: 6px; overflow: hidden;">
+                                            <button onclick="updateItemQuantity(${item.cartId}, -1)" 
+                                                    style="background: #e2e8f0; color: #4a5568; border: none; width: 24px; height: 24px; cursor: pointer; font-weight: bold;">-</button>
+                                            <span style="padding: 0 8px; font-size: 0.9rem; font-weight: bold; min-width: 20px; text-align: center;">${item.quantity}</span>
+                                            <button onclick="updateItemQuantity(${item.cartId}, 1)" 
+                                                    style="background: #e2e8f0; color: #4a5568; border: none; width: 24px; height: 24px; cursor: pointer; font-weight: bold;">+</button>
+                                        </div>
+                                        <button onclick="removeFromCart(${item.cartId})" 
+                                                style="background: #fed7d7; color: #c53030; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 0.8rem; font-weight: bold;">×</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    cartItems.appendChild(avatarSection);
+                    
+                    totalItems += items.reduce((sum, item) => sum + item.quantity, 0);
+                    grandTotal += avatarTotal;
+                });
+            }
+            
+            cartCount.textContent = totalItems;
+            totalAmount.textContent = `฿${grandTotal}`;
+            appState.totalAmount = grandTotal;
+            
+            // Update checkout button state
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            if (checkoutBtn) {
+                checkoutBtn.disabled = grandTotal === 0;
+                checkoutBtn.style.opacity = grandTotal === 0 ? '0.5' : '1';
+                checkoutBtn.style.cursor = grandTotal === 0 ? 'not-allowed' : 'pointer';
+            }
+        }
+
+        // Fixed quantity management
+        function updateItemQuantity(cartId, change) {
+            const itemIndex = appState.cart.findIndex(item => item.cartId === cartId);
+            
+            if (itemIndex !== -1) {
+                const item = appState.cart[itemIndex];
+                const newQuantity = Math.max(1, item.quantity + change);
+                
+                if (newQuantity !== item.quantity) {
+                    item.quantity = newQuantity;
+                    updateCartDisplay();
+                }
+            }
+        }
+
+        function removeFromCart(cartId) {
+            const itemIndex = appState.cart.findIndex(item => item.cartId === cartId);
+            
+            if (itemIndex !== -1) {
+                appState.cart.splice(itemIndex, 1);
+                updateCartDisplay();
+                showSuccessMessage(getCurrentText('Item removed from cart', 'นำสินค้าออกจากตะกร้าแล้ว'));
+            }
+        }
+
+        function clearCart() {
+            if (confirm(getCurrentText('Clear entire cart?', 'ล้างตะกร้าทั้งหมดหรือไม่?'))) {
+                appState.cart = [];
+                updateCartDisplay();
+                showSuccessMessage(getCurrentText('Cart cleared!', 'ล้างตะกร้าแล้ว!'));
+            }
+        }
+
+        function toggleCart() {
+            const cart = document.getElementById('cart');
+            if (cart.classList.contains('hidden')) {
+                cart.classList.remove('hidden');
+                handleCartDisplay();
+            } else {
+                cart.classList.add('hidden');
+            }
+        }
+
+        // Checkout Functions
+        function goToCheckout() {
+            if (appState.cart.length === 0) {
+                alert(getCurrentText('Your cart is empty!', 'ตะกร้าของคุณว่าง!'));
+                return;
+            }
+            
+            document.getElementById('menuStep').classList.add('hidden');
+            document.getElementById('checkoutStep').classList.remove('hidden');
+            document.getElementById('cart').classList.add('hidden');
+            renderCheckout();
+        }
+
+        function renderCheckout() {
+            const container = document.getElementById('checkoutContent');
+            
+            let checkoutHTML = `<h3 style="margin-bottom: 25px;">${getCurrentText('Order Summary', 'สรุปการสั่งอาหาร')}</h3>`;
+            
+            // Group items by avatar
+            const itemsByAvatar = {};
+            appState.cart.forEach(item => {
+                if (!itemsByAvatar[item.avatarId]) {
+                    itemsByAvatar[item.avatarId] = [];
+                }
+                itemsByAvatar[item.avatarId].push(item);
+            });
+            
+            Object.keys(itemsByAvatar).forEach(avatarId => {
+                const avatar = appState.avatars[avatarId];
+                const items = itemsByAvatar[avatarId];
+                const avatarTotal = items.reduce((sum, item) => sum + (item.finalPrice * item.quantity), 0);
+                
+                checkoutHTML += `
+                    <div style="background: #f7fafc; padding: 20px; border-radius: 12px; margin: 15px 0;">
+                        <h4 style="margin-bottom: 15px; color: #2d3748;">${avatar.animal} ${avatar.nickname}</h4>
+                        ${items.map(item => `
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 600;">${item.displayName}</div>
+                                    ${item.customizations.notes ? `<div style="font-size: 0.8rem; color: #718096; margin-top: 2px;">"${item.customizations.notes}"</div>` : ''}
+                                    <div style="font-size: 0.8rem; color: #4a5568;">Qty: ${item.quantity}</div>
+                                </div>
+                                <span style="font-weight: bold; color: #667eea;">฿${item.finalPrice * item.quantity}</span>
+                            </div>
+                        `).join('')}
+                        <div style="border-top: 2px solid #e2e8f0; margin-top: 15px; padding-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong>${getCurrentText('Subtotal:', 'ยอดรวม:')} ฿${avatarTotal}</strong>
+                            </div>
+                            <label style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
+                                <span>${getCurrentText('Payment Method:', 'วิธีชำระเงิน:')}</span>
+                                <select onchange="updatePaymentMethod(${avatarId}, this.value)" 
+                                        style="padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 5px; background: white;">
+                                    <option value="cash">${getCurrentText('Cash', 'เงินสด')}</option>
+                                    <option value="qr">${getCurrentText('QR/PromptPay', 'QR/พร้อมเพย์')}</option>
+                                    <option value="card">${getCurrentText('Credit Card', 'บัตรเครดิต')}</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            checkoutHTML += `
+                <div style="background: #667eea; color: white; padding: 25px; border-radius: 12px; text-align: center; margin-top: 25px;">
+                    <h3 style="margin-bottom: 10px;">${getCurrentText('Grand Total:', 'ยอดรวมทั้งหมด:')} ฿${appState.totalAmount}</h3>
+                    <p>${getCurrentText('Table:', 'โต๊ะ:')} ${appState.tableNumber} | ${getCurrentText('Queue:', 'คิว:')} ${appState.queueNumber}</p>
+                </div>
+                <button class="btn-primary" onclick="confirmOrder()" style="width: 100%; margin-top: 25px; font-size: 1.2rem; padding: 20px;">
+                    ${getCurrentText('Confirm Order', 'ยืนยันการสั่ง')}
+                </button>
+            `;
+            
+            container.innerHTML = checkoutHTML;
+        }
+
+        function updatePaymentMethod(avatarId, method) {
+            const avatar = appState.avatars.find(a => a.id == avatarId);
+            if (avatar) {
+                avatar.paymentMethod = method;
+            }
+        }
+
+        function confirmOrder() {
+            // Generate new queue number
+            appState.queueNumber = 'A' + Math.floor(Math.random() * 99 + 1).toString().padStart(2, '0');
+            document.getElementById('queueNumber').textContent = appState.queueNumber;
+            
+            document.getElementById('checkoutStep').classList.add('hidden');
+            document.getElementById('statusStep').classList.remove('hidden');
+            
+            // Start status updates
+            simulateOrderProgress();
+            
+            showSuccessMessage(getCurrentText(
+                `Order confirmed! Queue number: ${appState.queueNumber}`,
+                `ยืนยันการสั่งแล้ว! หมายเลขคิว: ${appState.queueNumber}`
+            ));
+        }
+
+        function simulateOrderProgress() {
+            const steps = document.querySelectorAll('.status-step');
+            let currentStatusIndex = 0;
+            
+            const updateStatus = () => {
+                steps.forEach((step, index) => {
+                    step.classList.remove('active', 'completed');
+                    if (index < currentStatusIndex) {
+                        step.classList.add('completed');
+                    } else if (index === currentStatusIndex) {
+                        step.classList.add('active');
+                    }
+                });
+                
+                if (currentStatusIndex < steps.length - 1) {
+                    currentStatusIndex++;
+                    setTimeout(updateStatus, 3000); // Update every 3 seconds
+                } else {
+                    // Order complete
+                    setTimeout(() => {
+                        showSuccessMessage(getCurrentText(
+                            'Your order has been served! Enjoy your meal!',
+                            'อาหารของคุณเสิร์ฟแล้ว! รับประทานอาหารให้อร่อยนะ!'
+                        ));
+                    }, 1000);
+                }
+            };
+            
+            setTimeout(updateStatus, 2000); // Start after 2 seconds
+        }
+
+        // Language Functions - Fixed
+        function setLanguage(lang) {
+            appState.language = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                }
+            });
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            // Update all text elements with language data attributes
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.getAttribute(`data-${appState.language}`);
+                if (text) {
+                    element.textContent = text;
+                }
+            });
+            
+            // Update placeholders
+            document.querySelectorAll('input[placeholder]').forEach(input => {
+                if (input.hasAttribute('data-en') && input.hasAttribute('data-th')) {
+                    const enText = input.getAttribute('data-en');
+                    const thText = input.getAttribute('data-th');
+                    input.placeholder = appState.language === 'th' ? thText : enText;
+                }
+            });
+            
+            // Re-render dynamic content if needed
+            if (!document.getElementById('menuStep').classList.contains('hidden')) {
+                renderMenu();
+            }
+            if (appState.avatars.length > 0) {
+                renderAvatars();
+                updateCartDisplay();
+            }
+        }
+
+        // Admin Functions - Fixed
+        function showAdminLogin() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 400px;">
+                    <h2 style="margin-bottom: 30px; color: #2d3748; text-align: center;">Admin Login</h2>
+                    <div style="display: grid; gap: 15px;">
+                        <input type="text" id="adminUsername" placeholder="Username" value="admin"
+                               style="width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                        <input type="password" id="adminPassword" placeholder="Password" value="admin123"
+                               style="width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                        <button onclick="tryAdminLogin()" class="btn-primary" style="width: 100%; margin-top: 10px;">Login</button>
+                        <button onclick="closeModal()" 
+                                style="background: #e2e8f0; color: #4a5568; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: 600;">Cancel</button>
+                    </div>
+                    <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-top: 20px; text-align: center;">
+                        <p style="color: #718096; font-size: 0.9rem; margin-bottom: 5px;">Demo Credentials (pre-filled):</p>
+                        <p style="color: #4a5568; font-weight: 600;">Username: admin</p>
+                        <p style="color: #4a5568; font-weight: 600;">Password: admin123</p>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Add click outside to close
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Add Enter key support
+            modal.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    tryAdminLogin();
+                }
+            });
+            
+            // Focus on username input
+            setTimeout(() => {
+                const usernameInput = document.getElementById('adminUsername');
+                if (usernameInput) {
+                    usernameInput.focus();
+                    usernameInput.select();
+                }
+            }, 100);
+        }
+
+        function handleAdminLogin(event) {
+            if (event) {
+                event.preventDefault();
+            }
+            
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            
+            console.log('Login attempt:', username, password); // Debug log
+            
+            // Simple demo authentication
+            if (username === 'admin' && password === 'admin123') {
+                appState.adminLoggedIn = true;
+                closeModal();
+                
+                // Hide landing and show admin
+                document.getElementById('landing').style.display = 'none';
+                document.getElementById('adminApp').style.display = 'block';
+                appState.currentStep = 'admin';
+                
+                // Load admin dashboard
+                setTimeout(() => {
+                    loadAdminDashboard();
+                }, 100);
+                
+                showSuccessMessage('Successfully logged in as admin!');
+            } else {
+                // Show error styling
+                const usernameInput = document.getElementById('adminUsername');
+                const passwordInput = document.getElementById('adminPassword');
+                
+                if (usernameInput && passwordInput) {
+                    [usernameInput, passwordInput].forEach(input => {
+                        input.style.borderColor = '#f56565';
+                        input.style.background = '#fed7d7';
+                    });
+                    
+                    alert('Invalid credentials. Use admin / admin123 for demo.');
+                    
+                    // Reset styling after 3 seconds
+                    setTimeout(() => {
+                        [usernameInput, passwordInput].forEach(input => {
+                            input.style.borderColor = '#e2e8f0';
+                            input.style.background = 'white';
+                        });
+                    }, 3000);
+                }
+            }
+            
+            return false;
+        }
+
+        // Alternative login function that can be called directly
+        function tryAdminLogin() {
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            
+            if (username === 'admin' && password === 'admin123') {
+                appState.adminLoggedIn = true;
+                closeModal();
+                
+                document.getElementById('landing').style.display = 'none';
+                document.getElementById('adminApp').style.display = 'block';
+                appState.currentStep = 'admin';
+                
+                loadAdminDashboard();
+                showSuccessMessage('Successfully logged in as admin!');
+                return true;
+            } else {
+                alert('Invalid credentials. Please use:\nUsername: admin\nPassword: admin123');
+                return false;
+            }
+        }
+
+        function logout() {
+            appState.adminLoggedIn = false;
+            goBack();
+        }
+
+        function loadAdminDashboard() {
+            console.log('Loading admin dashboard...');
+            
+            // Ensure we're showing the admin app
+            document.getElementById('adminApp').classList.remove('hidden');
+            
+            // Update stats first
+            updateAdminStats();
+            
+            // Load initial tab content
+            setTimeout(() => {
+                loadQueue();
+                loadTables(); 
+                loadMenuManagement();
+                
+                // Make sure queue tab is active by default
+                showAdminTab('queue');
+            }, 200);
+        }
+
+        function updateAdminStats() {
+            const stats = {
+                todayOrders: Math.floor(Math.random() * 50 + 20),
+                todayRevenue: Math.floor(Math.random() * 5000 + 2000),
+                occupiedTables: Math.floor(Math.random() * 8 + 4),
+                avgWaitTime: Math.floor(Math.random() * 20 + 10)
+            };
+            
+            // Update each stat element safely
+            const todayOrdersEl = document.getElementById('todayOrders');
+            if (todayOrdersEl) todayOrdersEl.textContent = stats.todayOrders;
+            
+            const todayRevenueEl = document.getElementById('todayRevenue');
+            if (todayRevenueEl) todayRevenueEl.textContent = '฿' + stats.todayRevenue.toLocaleString();
+            
+            const occupiedTablesEl = document.getElementById('occupiedTables');
+            if (occupiedTablesEl) occupiedTablesEl.textContent = `${stats.occupiedTables}/12`;
+            
+            const avgWaitTimeEl = document.getElementById('avgWaitTime');
+            if (avgWaitTimeEl) avgWaitTimeEl.textContent = stats.avgWaitTime + 'm';
+            
+            console.log('Admin stats updated:', stats);
+        }
+
+        // Fixed admin tab system with better debugging
+        function showAdminTab(tabName) {
+            console.log('Switching to admin tab:', tabName);
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            const targetButton = document.querySelector(`[data-tab="${tabName}"]`);
+            if (targetButton) {
+                targetButton.classList.add('active');
+                console.log('Activated tab button:', tabName);
+            } else {
+                console.log('Tab button not found:', tabName);
+            }
+            
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+                console.log('Hidden tab content');
+            });
+            
+            // Show selected tab content
+            const targetTab = document.getElementById(tabName + 'Tab');
+            if (targetTab) {
+                targetTab.classList.remove('hidden');
+                console.log('Showing tab content:', tabName + 'Tab');
+                
+                // Force content visibility
+                targetTab.style.display = 'block';
+            } else {
+                console.log('Tab content not found:', tabName + 'Tab');
+            }
+            
+            // Load specific data based on tab
+            setTimeout(() => {
+                if (tabName === 'menu') {
+                    loadMenuManagement();
+                } else if (tabName === 'tables') {
+                    loadTables();
+                } else if (tabName === 'queue') {
+                    loadQueue();
+                }
+            }, 100);
+        }
+
+        function loadQueue() {
+            const queueList = document.getElementById('queueList');
+            if (!queueList) {
+                console.log('Queue list element not found');
+                return;
+            }
+            
+            const sampleQueue = [
+                { queue: 'A01', table: 'T05', items: 3, total: 450, status: 'cooking', time: '12:30' },
+                { queue: 'A02', table: 'T03', items: 2, total: 280, status: 'preparing', time: '12:35' },
+                { queue: 'A03', table: 'T08', items: 5, total: 720, status: 'pending', time: '12:40' },
+                { queue: 'A04', table: 'T12', items: 1, total: 150, status: 'ready', time: '12:25' },
+                { queue: 'A05', table: 'T07', items: 4, total: 680, status: 'served', time: '12:15' }
+            ];
+            
+            console.log('Loading queue with', sampleQueue.length, 'items');
+            
+            const queueHTML = sampleQueue.map(order => `
+                <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; color: black; border: 1px solid #e2e8f0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                <strong style="font-size: 1.2rem; color: #667eea;">${order.queue}</strong>
+                                <span style="background: #edf2f7; padding: 4px 8px; border-radius: 6px; font-size: 0.9rem;">Table ${order.table}</span>
+                                <span style="background: #f0fff4; color: #22543d; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem;">${order.time}</span>
+                            </div>
+                            <div style="color: #718096;">${order.items} items - ฿${order.total}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <select onchange="updateOrderStatus('${order.queue}', this.value)" 
+                                    style="padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 5px; font-weight: 600; background: white;">
+                                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="preparing" ${order.status === 'preparing' ? 'selected' : ''}>Preparing</option>
+                                <option value="cooking" ${order.status === 'cooking' ? 'selected' : ''}>Cooking</option>
+                                <option value="ready" ${order.status === 'ready' ? 'selected' : ''}>Ready</option>
+                                <option value="served" ${order.status === 'served' ? 'selected' : ''}>Served</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            queueList.innerHTML = queueHTML;
+            console.log('Queue loaded successfully');
+        }
+
+        function updateOrderStatus(queueNumber, status) {
+            console.log(`Updating ${queueNumber} to ${status}`);
+            showSuccessMessage(`Order ${queueNumber} updated to ${status}`);
+        }
+
+        function loadTables() {
+            const tablesGrid = document.getElementById('tablesGrid');
+            if (!tablesGrid) return;
+            
+            const tables = [];
+            
+            for (let i = 1; i <= 12; i++) {
+                const rand = Math.random();
+                const status = rand > 0.6 ? 'occupied' : rand > 0.3 ? 'free' : 'dirty';
+                const queueNumber = status === 'occupied' ? 'A' + Math.floor(Math.random() * 10 + 1).toString().padStart(2, '0') : null;
+                tables.push({ number: i, status, queueNumber });
+            }
+            
+            tablesGrid.innerHTML = tables.map(table => `
+                <div style="background: white; padding: 20px; border-radius: 12px; text-align: center; margin: 10px; color: black;">
+                    <h3 style="margin-bottom: 15px; color: #2d3748;">Table ${table.number}</h3>
+                    <div style="padding: 15px; margin: 10px 0; border-radius: 8px; font-weight: 600;
+                                background: ${table.status === 'free' ? '#c6f6d5' : table.status === 'occupied' ? '#fed7d7' : '#feebc8'};
+                                color: ${table.status === 'free' ? '#22543d' : table.status === 'occupied' ? '#c53030' : '#c05621'};">
+                        ${table.status.charAt(0).toUpperCase() + table.status.slice(1)}
+                        ${table.queueNumber ? `<br><small>Queue: ${table.queueNumber}</small>` : ''}
+                    </div>
+                    ${table.status !== 'free' ? `
+                        <button onclick="resetTable(${table.number})" class="btn-primary" 
+                                style="padding: 8px 16px; font-size: 0.9rem; margin-top: 10px;">
+                            ${table.status === 'dirty' ? 'Clean' : 'Reset'}
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            tablesGrid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;';
+        }
+
+        function resetTable(tableNumber) {
+            showSuccessMessage(`Table ${tableNumber} has been reset and is ready for new customers.`);
+            loadTables(); // Refresh table display
+        }
+
+        function loadMenuManagement() {
+            const list = document.getElementById('menuManagementList');
+            if (!list) return;
+            
+            list.innerHTML = '';
+            
+            Object.values(menuData).flat().forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.style.cssText = `
+                    background: #4a5568; 
+                    padding: 20px; 
+                    border-radius: 12px; 
+                    margin-bottom: 15px; 
+                    display: flex; 
+                    justify-content: space-between; 
+                    align-items: center;
+                    color: white;
+                `;
+                itemDiv.innerHTML = `
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                            <span style="font-size: 1.5rem;">${item.icon}</span>
+                            <strong>${item.name.en} / ${item.name.th}</strong>
+                        </div>
+                        <div style="color: #a0aec0; font-size: 0.9rem;">
+                            ฿${item.price} - ${item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                            ${item.badges.length > 0 ? ` | ${item.badges.join(', ')}` : ''}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="editMenuItem(${item.id})" 
+                                style="background: #4299e1; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;">Edit</button>
+                        <button onclick="deleteMenuItem(${item.id})" 
+                                style="background: #f56565; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;">Delete</button>
+                    </div>
+                `;
+                list.appendChild(itemDiv);
+            });
+        }
+
+        function showAddItemForm() {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2 style="margin-bottom: 30px; color: #2d3748;">Add New Menu Item</h2>
+                    <form onsubmit="return addMenuItem(event)">
+                        <div style="display: grid; gap: 15px;">
+                            <input type="text" id="itemNameEn" placeholder="Name (English)" required
+                                   style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                            <input type="text" id="itemNameTh" placeholder="Name (Thai)" required
+                                   style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                            <textarea id="itemDescEn" placeholder="Description (English)" required
+                                      style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; height: 80px; resize: vertical; font-size: 1rem;"></textarea>
+                            <textarea id="itemDescTh" placeholder="Description (Thai)" required
+                                      style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; height: 80px; resize: vertical; font-size: 1rem;"></textarea>
+                            <input type="number" id="itemPrice" placeholder="Price (THB)" min="1" required
+                                   style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                            <select id="itemCategory" required style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                                <option value="">Select Category</option>
+                                <option value="appetizers">Appetizers</option>
+                                <option value="mains">Main Course</option>
+                                <option value="desserts">Desserts</option>
+                                <option value="drinks">Drinks</option>
+                            </select>
+                            <input type="text" id="itemIcon" placeholder="Emoji Icon (🍜)" maxlength="2" required
+                                   style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                            
+                            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; background: #f7fafc; padding: 15px; border-radius: 8px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="isVegetarian"> Vegetarian
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="isSpicy"> Spicy
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="isPopular"> Popular
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button type="submit" class="btn-primary" style="flex: 1;">Add Item</button>
+                            <button type="button" onclick="closeModal()" 
+                                    style="background: #e2e8f0; color: #4a5568; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-weight: 600;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        function addMenuItem(event) {
+            event.preventDefault();
+            
+            const nameEn = document.getElementById('itemNameEn').value.trim();
+            const nameTh = document.getElementById('itemNameTh').value.trim();
+            const descEn = document.getElementById('itemDescEn').value.trim();
+            const descTh = document.getElementById('itemDescTh').value.trim();
+            const price = parseInt(document.getElementById('itemPrice').value);
+            const category = document.getElementById('itemCategory').value;
+            const icon = document.getElementById('itemIcon').value.trim() || '🍽️';
+            
+            if (!nameEn || !nameTh || !descEn || !descTh || !price || price <= 0 || !category) {
+                alert('Please fill in all required fields with valid data.');
+                return false;
+            }
+            
+            const newItem = {
+                id: Date.now(),
+                name: { en: nameEn, th: nameTh },
+                description: { en: descEn, th: descTh },
+                price: price,
+                category: category,
+                icon: icon,
+                badges: [],
+                dietary: {
+                    vegetarian: document.getElementById('isVegetarian').checked,
+                    spicy: document.getElementById('isSpicy').checked
+                }
+            };
+            
+            if (document.getElementById('isVegetarian').checked) newItem.badges.push('vegetarian');
+            if (document.getElementById('isSpicy').checked) newItem.badges.push('spicy');
+            if (document.getElementById('isPopular').checked) newItem.badges.push('popular');
+            
+            // Add to menu data
+            menuData[newItem.category].push(newItem);
+            
+            closeModal();
+            showSuccessMessage('Menu item added successfully!');
+            loadMenuManagement();
+            
+            // Refresh menu if currently viewing
+            if (!document.getElementById('menuStep').classList.contains('hidden')) {
+                renderMenu();
+            }
+            
+            return false;
+        }
+
+        function editMenuItem(itemId) {
+            const item = Object.values(menuData).flat().find(i => i.id === itemId);
+            if (!item) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2 style="margin-bottom: 30px; color: #2d3748;">Edit Menu Item</h2>
+                    <form onsubmit="return saveEditedItem(${itemId}, event)">
+                        <div style="display: grid; gap: 15px;">
+                            <input type="text" id="editItemNameEn" placeholder="Name (English)" value="${item.name.en}" required
+                                   style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                            <input type="text" id="editItemNameTh" placeholder="Name (Thai)" value="${item.name.th}" required
+                                   style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                            <textarea id="editItemDescEn" placeholder="Description (English)" required
+                                      style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; height: 80px; resize: vertical; font-size: 1rem;">${item.description.en}</textarea>
+                            <textarea id="editItemDescTh" placeholder="Description (Thai)" required
+                                      style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; height: 80px; resize: vertical; font-size: 1rem;">${item.description.th}</textarea>
+                            <input type="number" id="editItemPrice" placeholder="Price (THB)" min="1" value="${item.price}" required
+                                   style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                            <select id="editItemCategory" required style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                                <option value="appetizers" ${item.category === 'appetizers' ? 'selected' : ''}>Appetizers</option>
+                                <option value="mains" ${item.category === 'mains' ? 'selected' : ''}>Main Course</option>
+                                <option value="desserts" ${item.category === 'desserts' ? 'selected' : ''}>Desserts</option>
+                                <option value="drinks" ${item.category === 'drinks' ? 'selected' : ''}>Drinks</option>
+                            </select>
+                            <input type="text" id="editItemIcon" placeholder="Emoji Icon (🍜)" maxlength="2" value="${item.icon}" required
+                                   style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem;">
+                            
+                            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; background: #f7fafc; padding: 15px; border-radius: 8px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="editIsVegetarian" ${item.dietary.vegetarian ? 'checked' : ''}> Vegetarian
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="editIsSpicy" ${item.dietary.spicy ? 'checked' : ''}> Spicy
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="editIsPopular" ${item.badges.includes('popular') ? 'checked' : ''}> Popular
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button type="submit" class="btn-primary" style="flex: 1;">Save Changes</button>
+                            <button type="button" onclick="closeModal()" 
+                                    style="background: #e2e8f0; color: #4a5568; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-weight: 600;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        function saveEditedItem(itemId, event) {
+            event.preventDefault();
+            
+            const nameEn = document.getElementById('editItemNameEn').value.trim();
+            const nameTh = document.getElementById('editItemNameTh').value.trim();
+            const descEn = document.getElementById('editItemDescEn').value.trim();
+            const descTh = document.getElementById('editItemDescTh').value.trim();
+            const price = parseInt(document.getElementById('editItemPrice').value);
+            const category = document.getElementById('editItemCategory').value;
+            const icon = document.getElementById('editItemIcon').value.trim() || '🍽️';
+            
+            if (!nameEn || !nameTh || !descEn || !descTh || !price || price <= 0 || !category) {
+                alert('Please fill in all fields with valid data.');
+                return false;
+            }
+            
+            // Find and update the item
+            let itemFound = false;
+            Object.keys(menuData).forEach(cat => {
+                const itemIndex = menuData[cat].findIndex(i => i.id === itemId);
+                if (itemIndex !== -1) {
+                    // Remove from old category
+                    menuData[cat].splice(itemIndex, 1);
+                    itemFound = true;
+                }
+            });
+            
+            if (itemFound) {
+                const updatedItem = {
+                    id: itemId,
+                    name: { en: nameEn, th: nameTh },
+                    description: { en: descEn, th: descTh },
+                    price: price,
+                    category: category,
+                    icon: icon,
+                    badges: [],
+                    dietary: {
+                        vegetarian: document.getElementById('editIsVegetarian').checked,
+                        spicy: document.getElementById('editIsSpicy').checked
+                    }
+                };
+                
+                if (document.getElementById('editIsVegetarian').checked) updatedItem.badges.push('vegetarian');
+                if (document.getElementById('editIsSpicy').checked) updatedItem.badges.push('spicy');
+                if (document.getElementById('editIsPopular').checked) updatedItem.badges.push('popular');
+                
+                // Add to new category
+                menuData[category].push(updatedItem);
+                
+                closeModal();
+                showSuccessMessage('Menu item updated successfully!');
+                loadMenuManagement();
+                
+                // Refresh menu if currently viewing
+                if (!document.getElementById('menuStep').classList.contains('hidden')) {
+                    renderMenu();
+                }
+            }
+            
+            return false;
+        }
+
+        function deleteMenuItem(itemId) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                // Remove from all categories
+                Object.keys(menuData).forEach(category => {
+                    menuData[category] = menuData[category].filter(item => item.id !== itemId);
+                });
+                loadMenuManagement();
+                showSuccessMessage('Item deleted successfully!');
+                
+                // Refresh menu if currently viewing
+                if (!document.getElementById('menuStep').classList.contains('hidden')) {
+                    renderMenu();
+                }
+            }
+        }
+
+        // Success message system with proper cleanup
+        function showSuccessMessage(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #48bb78;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 12px;
+                z-index: 2000;
+                animation: slideInRight 0.3s ease-out;
+                box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
+                max-width: 300px;
+                word-wrap: break-word;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // Proper cleanup with error handling
+            const removeToast = () => {
+                if (document.body.contains(toast)) {
+                    toast.style.animation = 'slideOutRight 0.3s ease-out forwards';
+                    setTimeout(() => {
+                        if (document.body.contains(toast)) {
+                            document.body.removeChild(toast);
+                        }
+                    }, 300);
+                }
+            };
+            
+            setTimeout(removeToast, 3000);
+        }
+
+        // Responsive cart behavior
+        function checkMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        function handleCartDisplay() {
+            const cart = document.getElementById('cart');
+            if (!cart) return;
+            
+            if (checkMobile() && !cart.classList.contains('hidden')) {
+                cart.style.position = 'relative';
+                cart.style.width = '100%';
+                cart.style.right = 'auto';
+                cart.style.top = 'auto';
+                cart.style.marginTop = '20px';
+            } else if (!checkMobile()) {
+                cart.style.position = 'fixed';
+                cart.style.width = '300px';
+                cart.style.right = '20px';
+                cart.style.top = '100px';
+                cart.style.marginTop = '0';
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Restaurant Digital Ordering System Loaded');
+            
+            // Initialize search functionality with proper event binding
+            const searchInput = document.getElementById('menuSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    searchMenu(e.target.value);
+                });
+            }
+            
+            // Initialize category filter buttons with proper event binding
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const category = this.getAttribute('data-category');
+                    filterMenu(category, this);
+                });
+            });
+            
+            // Add keyboard support
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+            
+            // Initialize cart display
+            updateCartDisplay();
+            
+            // Handle window resize
+            window.addEventListener('resize', debounce(handleCartDisplay, 250));
+            
+            // Initialize language system
+            updateLanguage();
+        });
+
+        // Error handling
+        window.addEventListener('error', function(e) {
+            console.error('Application error:', e);
+            showSuccessMessage('An error occurred. Please try again.');
+        });
+
+        // Export for debugging
+        window.restaurantApp = {
+            appState,
+            menuData,
+            functions: {
+                startCustomerFlow,
+                startAdminFlow,
+                updateOrderStatus,
+                addMenuItem,
+                deleteMenuItem,
+                updateCartDisplay,
+                renderMenu
+            }
+        };
+
+        console.log('Restaurant app fully initialized with all bug fixes applied!');
+    </script>
+
+<script>
+(function(){
+  // 1) Wire up live search if the element exists
+  document.addEventListener('DOMContentLoaded', function () {
+    try {
+      var el = document.getElementById('menuSearch');
+      if (el && typeof window.searchMenu === 'function') {
+        // Avoid duplicate bindings
+        var alreadyBound = el.getAttribute('data-search-bound') === '1';
+        if (!alreadyBound) {
+          el.addEventListener('input', function(e){ window.searchMenu(e.target.value); });
+          el.setAttribute('data-search-bound', '1');
+        }
+      }
+    } catch(e){ console.warn('search wiring error:', e); }
+  });
+
+  // 2) Ensure showAdminLogin exists (simple modal)
+  if (typeof window.showAdminLogin !== 'function') {
+    window.showAdminLogin = function () {
+      // build modal UI
+      var overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+
+      var modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.innerHTML = [
+        '<header>Admin Login</header>',
+        '<div class="content">',
+          '<label style="display:block;margin:.5rem 0 .25rem">Username</label>',
+          '<input id="adminUser" type="text" style="width:100%;padding:.5rem;border:1px solid #ccc;border-radius:8px">',
+          '<label style="display:block;margin:.75rem 0 .25rem">Password</label>',
+          '<input id="adminPass" type="password" style="width:100%;padding:.5rem;border:1px solid #ccc;border-radius:8px">',
+          '<div id="adminError" style="color:#c00;margin-top:.5rem;display:none">Invalid credentials</div>',
+        '</div>',
+        '<footer>',
+          '<button class="btn" id="adminCancel">Cancel</button>',
+          '<button class="btn btn-primary" id="adminSubmit">Login</button>',
+        '</footer>'
+      ].join('');
+
+      overlay.addEventListener('click', function(e){
+        if (e.target === overlay) {
+          overlay.remove();
+        }
+      });
+
+      modal.querySelector('#adminCancel').addEventListener('click', function(){
+        overlay.remove();
+      });
+
+      modal.querySelector('#adminSubmit').addEventListener('click', function(){
+        var u = modal.querySelector('#adminUser').value.trim();
+        var p = modal.querySelector('#adminPass').value;
+        // Placeholder auth; integrate your real check here
+        if (window.tryAdminLogin) {
+          // If the app already provides a login function, use it
+          Promise.resolve(window.tryAdminLogin(u, p)).then(function(ok){
+            if (ok) {
+              overlay.remove();
+            } else {
+              modal.querySelector('#adminError').style.display = 'block';
+            }
+          }).catch(function(){
+            modal.querySelector('#adminError').style.display = 'block';
+          });
+        } else {
+          // Default demo check
+          if (u && p) {
+            overlay.remove();
+            console.info('Logged in as', u, '(demo)');
+          } else {
+            modal.querySelector('#adminError').style.display = 'block';
+          }
+        }
+      });
+
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+    };
+  }
+
+  // 3) Harden closeModal to remove all overlays
+  (function(){
+    var originalClose = window.closeModal;
+    window.closeModal = function(){
+      try {
+        var overlays = document.querySelectorAll('.modal-overlay');
+        if (overlays.length) {
+          overlays.forEach(function(n){ n.remove(); });
+          return;
+        }
+      } catch(e){ /* ignore */ }
+      if (typeof originalClose === 'function') return originalClose();
+    };
+  })();
+
+  // 4) Provide a safe simulateOrderProgress if missing
+  if (typeof window.simulateOrderProgress !== 'function') {
+    window.simulateOrderProgress = function simulateOrderProgress(orderId, onDone) {
+      // Simple staged progress via events or DOM updates
+      var stages = ['Queued','Preparing','Ready','Completed'];
+      var idx = 0;
+      var el = document.querySelector('[data-order-id="'+orderId+'"]') 
+            || document.getElementById('order-status');
+
+      function setStatus(s){
+        if (el) { el.textContent = s; }
+        window.dispatchEvent(new CustomEvent('order:status', { detail: { orderId: orderId, status: s } }));
+      }
+
+      function next(){
+        if (idx < stages.length) {
+          setStatus(stages[idx]);
+          idx += 1;
+          setTimeout(next, 1200);
+        } else {
+          if (typeof onDone === 'function') onDone();
+        }
+      }
+      next();
+    };
+  }
+})();
+</script>
+</body>
+</html>
